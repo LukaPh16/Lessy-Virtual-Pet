@@ -4,11 +4,23 @@ import os
 
 pygame.init()
 
-WIDTH, HEIGHT = 800, 600
-BACKGROUND = (160, 0, 255)
+WIDTH, HEIGHT = 500, 500
 
-new_width = 100
-new_height = 100
+#new_width = 100
+#new_height = 100
+
+BACKGROUND = (245, 204, 232)
+
+font_color = (255, 255, 255)
+button_color_light = (236, 157, 237)
+button_color_dark = (200, 128, 183)
+
+button_width = 50
+button_height = 20
+
+font = pygame.font.Font("assets/font/pixel.ttf", 8)
+
+text = font.render('quit', True, font_color)
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
@@ -36,12 +48,12 @@ try:
     image = pygame.image.load(full_path_idle).convert_alpha()
 
 except pygame.error as message:
-    print(f"Cannot load image: face.png - {message}")
+    print(f"Cannot load image: idle.png - {message}")
     sys.exit()
 
-scaled_image = pygame.transform.scale(image, (new_width, new_height))
+#scaled_image = pygame.transform.scale(image, (new_width, new_height))
 
-scaled_rect = scaled_image.get_rect(center = (WIDTH // 2, HEIGHT // 2))
+#scaled_rect = scaled_image.get_rect(center = (WIDTH // 2, HEIGHT // 2))
 
 running = True
 
@@ -50,13 +62,31 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-        screen.fill(BACKGROUND)
-
         pygame.display.flip()
 
-    if image:
-        screen.blit(scaled_image, scaled_rect)
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if WIDTH/2-40 <= mouse[0] <= WIDTH/2+40 and HEIGHT/2 <= mouse[1] <= HEIGHT/2+40:
+                pygame.quit()
+
+    mouse = pygame.mouse.get_pos()
+
+    screen.fill(BACKGROUND)
+
+    if WIDTH/2-40 <= mouse[0] <= WIDTH/2+40 and HEIGHT/2 <= mouse[1] <= HEIGHT/2+40:
+        pygame.draw.rect(screen, button_color_light, [WIDTH/2-40, HEIGHT/2, button_width, button_height])
+
+    else:
+        pygame.draw.rect(screen, button_color_dark, [WIDTH/2-40, HEIGHT/2, button_width, button_height])
+
+
+    screen.blit(text, (WIDTH/2-30, HEIGHT/2+5))
+
+
+
+    #if image:
+        #screen.blit(scaled_image, scaled_rect)
+
     
-    pygame.display.flip()
+    pygame.display.update()
 
 pygame.quit()
