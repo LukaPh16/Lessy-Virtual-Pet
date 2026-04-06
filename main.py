@@ -1,6 +1,7 @@
 import pygame
 import sys
 import os
+import time
 
 pygame.init()
 
@@ -9,8 +10,8 @@ font_path = "assets/font/pixel.ttf"
 WIDTH, HEIGHT = 500, 500
 
 BACKGROUND = (245, 204, 232)
-test_color = (255, 255, 255)
-white_color = (255, 255, 255)
+test_color = (255, 0, 0)
+white = (255, 255, 255)
 
 font_dark_color = (74, 32, 64)
 button_color_light = (236, 157, 237)
@@ -19,18 +20,25 @@ button_color_dark = (200, 128, 183)
 button_width = 80
 button_height = 30
 
-current_page = "menu"
+initial_page = 1
+current_page = "page1"
 
-intro_text = "Hello Tamar! This is a game I made for you!"
+page1_text = "Hello Tamar! This is a game I made for you!"
+page2_text = "In this game I brought someone closer to you!"
 
 visible_length = 0
-typing_speed = 0.02
+typing_speed = 0.05
 last_update = 0
 
 text_font = pygame.font.Font(font_path, 16)
 button_font = pygame.font.Font(font_path, 8)
 
-button_continue = button_font.render("Continue", True, white_color)
+continue_text = button_font.render("Continue", True, white)
+continue_text_x = WIDTH/2-31
+continue_text_y = HEIGHT/2+160
+
+button_continue_x = WIDTH/2-40
+button_continue_y = HEIGHT/2 + 150
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
@@ -71,6 +79,14 @@ def draw_text_box(surface, text, font, color, rect):
 
 running = True
 
+def button_continue():
+    if button_continue_x <= mouse[0] <= button_continue_x+80 and button_continue_y <= mouse[1] <= button_continue_y+30:
+        pygame.draw.rect(screen, button_color_light, [button_continue_x, button_continue_y, button_width, button_height], border_radius=4)
+    else:
+        pygame.draw.rect(screen, button_color_dark, [button_continue_x, button_continue_y, button_width, button_height], border_radius=4)
+
+    screen.blit(continue_text, (continue_text_x, continue_text_y))
+
 while running:
     events = pygame.event.get()
     mouse = pygame.mouse.get_pos()
@@ -80,36 +96,61 @@ while running:
             running = False
 
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if WIDTH/2-40 <= mouse[0] <= WIDTH/2+40 and HEIGHT/2 <= mouse[1] <= HEIGHT/2+30:
-                current_page = "continue"
+            if button_continue_x <= mouse[0] <= button_continue_x+80 and button_continue_y <= mouse[1] <= button_continue_y+30:
+                if current_page == f"page{initial_page}":
+                    initial_page+=1
+                    current_page = f"page{initial_page}"
+                    visible_length = 0
+                    last_update = 0
 
-    if current_page == "menu":
+    if current_page == "page1":
         current_time = pygame.time.get_ticks() / 1000
 
-        if visible_length < len(intro_text):
+        if visible_length < len(page1_text):
             if current_time - last_update > typing_speed:
                 visible_length += 1
                 last_update = current_time
 
-        display_text = intro_text[:visible_length]
+        display_text = page1_text[:visible_length]
 
         screen.fill(BACKGROUND)
 
-        box = pygame.Rect(50, 50, 400, 120)
-        pygame.draw.rect(screen, white_color, box, border_radius=8)
+        box = pygame.Rect(50, 200, 400, 60)
+        pygame.draw.rect(screen, white, box, border_radius=4)
 
         inner_box = box.inflate(-20, -20)
 
         draw_text_box(screen, display_text, text_font, font_dark_color, inner_box)
 
-        if WIDTH/2-40 <= mouse[0] <= WIDTH/2+40 and HEIGHT/2 <= mouse[1] <= HEIGHT/2+30:
-            pygame.draw.rect(screen, button_color_light, [WIDTH/2-40, HEIGHT/2, button_width, button_height])
-        else:
-            pygame.draw.rect(screen, button_color_dark, [WIDTH/2-40, HEIGHT/2, button_width, button_height])
+        if visible_length == len(page1_text):
+            button_continue()
 
-        screen.blit(button_continue, (WIDTH/2-30, HEIGHT/2+8))
+    elif current_page == "page2":
+        current_time = pygame.time.get_ticks() / 1000
 
-    elif current_page == "continue":
+        if visible_length < len(page2_text):
+            if current_time - last_update > typing_speed:
+                visible_length += 1
+                last_update = current_time
+
+        display_text = page2_text[:visible_length]
+
+        screen.fill(BACKGROUND)
+
+        box = pygame.Rect(50, 200, 400, 60)
+        pygame.draw.rect(screen, white, box, border_radius=4)
+
+        inner_box = box.inflate(-20, -20)
+
+        draw_text_box(screen, display_text, text_font, font_dark_color, inner_box)
+
+        if visible_length == len(page2_text):
+            button_continue()
+
+    elif current_page == "page3":
+        screen.fill(test_color)
+
+    elif current_page == "page4":
         screen.fill(test_color)
 
     pygame.display.update()
