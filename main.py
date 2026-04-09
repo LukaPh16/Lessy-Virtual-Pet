@@ -47,23 +47,32 @@ last_update = 0
 text_font = pygame.font.Font(font_path, 16)
 button_font = pygame.font.Font(font_path, 8)
 
-back_text = button_font.render("Back", True, white)
-back_text_x = 39
-back_text_y = 40
+button_width = 100
+button_height = 30
 
-button_back_width = 50
-button_back_height = 30
-button_back_x = 30
-button_back_y = 30
+feed_text = text_font.render("Feed", True, white)
+
+feed_button_x = 85
+feed_button_y = 365
+
+sleep_text = text_font.render("Sleep", True, white)
+
+sleep_button_x = 85
+sleep_button_y = 425
+
+back_text = button_font.render("Back", True, white)
+
+back_button_width = 50
+back_button_height = 30
+back_button_x = 30
+back_button_y = 30
 
 continue_text = button_font.render("Continue", True, white)
-continue_text_x = WIDTH/2-31
-continue_text_y = HEIGHT/2+160
 
-button_continue_width = 80
-button_continue_height = 30
-button_continue_x = WIDTH/2-40
-button_continue_y = HEIGHT/2 + 150
+continue_button_width = 83
+continue_button_height = 30
+continue_button_x = WIDTH/2-43
+continue_button_y = HEIGHT/2 + 150
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
@@ -120,23 +129,16 @@ def draw_text_box(surface, text, font, color, rect):
         surface.blit(text_surface, (rect.x, y))
         y += font.get_height()
 
-def button_back():
-    if button_back_x <= mouse[0] <= button_back_x+80 and button_back_x <= mouse[1] <= button_back_y+30:
-        pygame.draw.rect(screen, color2, [button_back_x,button_back_y, button_back_width, button_back_height], border_radius = 4)
+def button(x, y, width, height, text_surface):
+    if x <= mouse[0] <= x+width and y <= mouse[1] <= y+height:
+        color = color2
     else:
-        pygame.draw.rect(screen, color3, [button_back_x, button_back_y, button_back_width, button_back_height], border_radius = 4)
-    
-    screen.blit(back_text, (back_text_x, back_text_y))
-def button_continue():
-    if button_continue_x <= mouse[0] <= button_continue_x+80 and button_continue_y <= mouse[1] <= button_continue_y+30:
-        pygame.draw.rect(screen, color2, [button_continue_x, button_continue_y, button_continue_width, button_continue_height], border_radius=4)
-    else:
-        pygame.draw.rect(screen, color3, [button_continue_x, button_continue_y, button_continue_width, button_continue_height], border_radius=4)
-
-    screen.blit(continue_text, (continue_text_x, continue_text_y))
+        color = color3
+    pygame.draw.rect(screen, color, [x, y, width, height], border_radius = 2)
+    screen.blit(text_surface, (x+10, y+10))
 
 def initial_pages(page_text):
-    global visible_length, typing_speed, last_update
+    global current_page, visible_length, typing_speed, last_update
     current_time = pygame.time.get_ticks() / 1000
 
     if visible_length < len(page_text):
@@ -156,7 +158,17 @@ def initial_pages(page_text):
     draw_text_box(screen, display_text, text_font, color5, inner_box)
 
     if visible_length == len(page_text):
-        button_continue()
+        button(continue_button_x, continue_button_y, continue_button_width, continue_button_height, continue_text)
+
+    if event.type == pygame.MOUSEBUTTONDOWN:
+        if visible_length == len(pages_text[current_page]):
+                if continue_button_x <= mouse[0] <= continue_button_x+80 and continue_button_y <= mouse[1] <= continue_button_y+30:
+                    if current_page < len(pages_text) - 1:
+                        current_page += 1
+                        visible_length = 0
+                        last_update = 0
+
+                        save_progress(current_page)
 
 while running:
     events = pygame.event.get()
@@ -167,19 +179,11 @@ while running:
             running = False
 
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if visible_length == len(pages_text[current_page]):
-                if button_continue_x <= mouse[0] <= button_continue_x+80 and button_continue_y <= mouse[1] <= button_continue_y+30:
-                    if current_page < len(pages_text) - 1:
-                        current_page += 1
-                        visible_length = 0
-                        last_update = 0
-
-                        save_progress(current_page)
-
-            elif button_back_x <= mouse[0] <= button_back_x+80 and button_back_x <= mouse[1] <= button_back_y+30:
-                current_page -= 1
-                visible_length = 0
-                last_update = 0
+            if back_button_x <= mouse[0] <= back_button_x+80 and back_button_y <= mouse[1] <= back_button_y+30:
+                if current_page < len(pages_text) - 1:
+                    current_page -= 1
+                    visible_length = 0
+                    last_update = 0
 
                 save_progress(current_page)
                     
@@ -187,15 +191,13 @@ while running:
     if 0 <= current_page <= 3:
         initial_pages(pages_text[current_page])
         if current_page > 0:
-            button_back()
+            button(back_button_x, back_button_y, back_button_width, back_button_height, back_text)
 
     if current_page == 4:
         screen.fill(BACKGROUND)
 
-        screen.blit(idle_face, (WIDTH/4+28, HEIGHT/4))
-
-        button_continue()
-        button_back()
+        screen.blit(idle_face, (WIDTH/4+27, HEIGHT/4))
+        button(feed_button_x, feed_button_y, button_width, button_height, feed_text)
 
     if current_page == 5:
         screen.fill(test_color)
