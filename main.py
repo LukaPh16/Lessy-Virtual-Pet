@@ -51,17 +51,31 @@ button_width = 100
 button_height = 30
 
 feed_text = text_font.render("Feed", True, white)
-
 feed_button_x = 85
-feed_button_y = 365
+feed_button_y = 395
 
 sleep_text = text_font.render("Sleep", True, white)
-
 sleep_button_x = 85
-sleep_button_y = 425
+sleep_button_y = 440
+
+pet_text = text_font.render("Pet", True, white)
+pet_button_x = 315
+pet_button_y = 395
+
+clean_text = text_font.render("Clean", True, white)
+clean_button_x = 315
+clean_button_y = 440
+
+stats_text = text_font.render("Stats", True, white)
+stats_button_x = 200
+stats_button_y = 30
+
+box_x = 30
+box_y = 75
+box_width = 440
+box_height = 305
 
 back_text = button_font.render("Back", True, white)
-
 back_button_width = 50
 back_button_height = 30
 back_button_x = 30
@@ -135,7 +149,7 @@ def button(x, y, width, height, text_surface):
     else:
         color = color3
     pygame.draw.rect(screen, color, [x, y, width, height], border_radius = 2)
-    screen.blit(text_surface, (x+10, y+10))
+    screen.blit(text_surface, (x+10, y+8))
 
 def initial_pages(page_text):
     global current_page, visible_length, typing_speed, last_update
@@ -196,8 +210,14 @@ while running:
     if current_page == 4:
         screen.fill(BACKGROUND)
 
-        screen.blit(idle_face, (WIDTH/4+27, HEIGHT/4))
+        pygame.draw.rect(screen, color3, (box_x, box_y, box_width, box_height), 4, border_radius = 2)
+
+        screen.blit(idle_face, (WIDTH/2 - 98, HEIGHT/4))
         button(feed_button_x, feed_button_y, button_width, button_height, feed_text)
+        button(sleep_button_x, sleep_button_y, button_width, button_height, sleep_text)
+        button(pet_button_x, pet_button_y, button_width, button_height, pet_text)
+        button(clean_button_x, clean_button_y, button_width, button_height, clean_text)
+        button(stats_button_x, stats_button_y, button_width, button_height, stats_text)
 
     if current_page == 5:
         screen.fill(test_color)
