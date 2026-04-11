@@ -41,7 +41,7 @@ pages_text = [
 ]
 
 visible_length = 0
-typing_speed = 0.05
+typing_speed = 0.02
 last_update = 0
 
 text_font = pygame.font.Font(font_path, 16)
@@ -105,23 +105,31 @@ try:
 except pygame.error:
     pass
 
-def save_progress(page):
+def save_progress(page, pet):
     data = {
-        "page": page
+        "page": page,
+        "pet": pet
     }
 
     with open("assets/memory.json", "w") as f:
-        json.dump(data, f)
+        json.dump(data, f, indent=4)
 
 def load_progress():
+    default_pet = {
+        "hunger": 50,
+        "energy": 50,
+        "happiness": 50,
+        "cleanliness": 50
+    }
+
     try:
         with open("assets/memory.json", "r") as f:
             data = json.load(f)
-            return data.get("page", 0)
+            return data.get("page", 0), data.get("pet", default_pet)
     except:
-        return 0
+        return 0, default_pet
     
-current_page = load_progress()
+current_page, pet = load_progress()
 
 def draw_text_box(surface, text, font, color, rect):
     words = text.split(' ')
@@ -174,23 +182,26 @@ def initial_pages(page_text):
     if visible_length == len(page_text):
         button(continue_button_x, continue_button_y, continue_button_width, continue_button_height, continue_text)
 
-    if event.type == pygame.MOUSEBUTTONDOWN:
-        if visible_length == len(pages_text[current_page]):
+while running:
+    events = pygame.event.get()
+    mouse = pygame.mouse.get_pos()
+
+    if pygame.time.get_ticks() % 3000 < 20:
+        save_progress(current_page, pet)
+
+    for event in events:
+        if event.type == pygame.QUIT:
+            running = False
+        
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if visible_length == len(pages_text[current_page]):
                 if continue_button_x <= mouse[0] <= continue_button_x+80 and continue_button_y <= mouse[1] <= continue_button_y+30:
                     if current_page < len(pages_text) - 1:
                         current_page += 1
                         visible_length = 0
                         last_update = 0
 
-                        save_progress(current_page)
-
-while running:
-    events = pygame.event.get()
-    mouse = pygame.mouse.get_pos()
-
-    for event in events:
-        if event.type == pygame.QUIT:
-            running = False
+                        save_progress(current_page, pet)
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if back_button_x <= mouse[0] <= back_button_x+80 and back_button_y <= mouse[1] <= back_button_y+30:
@@ -199,7 +210,28 @@ while running:
                     visible_length = 0
                     last_update = 0
 
-                save_progress(current_page)
+                save_progress(current_page, pet)
+
+        if current_page == 4:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+
+                if feed_button_x <= mouse[0] <= feed_button_x+button_width and feed_button_y <= mouse[1] <= feed_button_y+button_height:
+                    pet["hunger"] += 10
+
+                if sleep_button_x <= mouse[0] <= sleep_button_x+button_width and sleep_button_y <= mouse[1] <= sleep_button_y+button_height:
+                    pet["energy"] += 10
+
+                if pet_button_x <= mouse[0] <= pet_button_x+button_width and pet_button_y <= mouse[1] <= pet_button_y+button_height:
+                    pet["happiness"] += 10
+
+                if clean_button_x <= mouse[0] <= clean_button_x+button_width and clean_button_y <= mouse[1] <= clean_button_y+button_height:
+                    pet["cleanliness"] += 10
+
+                if stats_button_x <= mouse[0] <= stats_button_x+button_width and stats_button_y <= mouse[1] <= stats_button_y+button_height:
+                    current_page = 5
+
+            for key in pet:
+                pet[key] = max(0, min(100, pet[key]))
                     
 
     if 0 <= current_page <= 3:
@@ -207,7 +239,7 @@ while running:
         if current_page > 0:
             button(back_button_x, back_button_y, back_button_width, back_button_height, back_text)
 
-    if current_page == 4:
+    elif current_page == 4:
         screen.fill(BACKGROUND)
 
         pygame.draw.rect(screen, color3, (box_x, box_y, box_width, box_height), 4, border_radius = 2)
@@ -219,10 +251,13 @@ while running:
         button(clean_button_x, clean_button_y, button_width, button_height, clean_text)
         button(stats_button_x, stats_button_y, button_width, button_height, stats_text)
 
-    if current_page == 5:
-        screen.fill(test_color)
-
-
+    elif current_page == 5:
+        screen.fill(BACKGROUND)
+        y = 90
+        for key, value in pet.items():
+            text = button_font.render(f"{key}: {value}", True, color5)
+            screen.blit(text, (200, y))
+            y += 20
 
     pygame.display.update()
     clock.tick(60)
