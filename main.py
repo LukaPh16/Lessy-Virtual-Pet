@@ -8,9 +8,17 @@ pygame.init()
 
 font_path = "assets/font/pixel.ttf"
 idle = pygame.image.load("assets/faces/idle.png")
+happy = pygame.image.load("assets/faces/happy.png")
+sad = pygame.image.load("assets/faces/sad.png")
+sleepy = pygame.image.load("assets/faces/sleepy.png")
+
+current_face = ""
 
 new_size = (200, 200)
 idle_face = pygame.transform.scale(idle, new_size)
+happy_face = pygame.transform.scale(happy, new_size)
+sad_face = pygame.transform.scale(sad, new_size)
+sleepy_face = pygame.transform.scale(sleepy, new_size)
 
 WIDTH, HEIGHT = 500, 500
 
@@ -126,7 +134,12 @@ def load_progress():
     try:
         with open("assets/memory.json", "r") as f:
             data = json.load(f)
-            return data.get("page", 0), data.get("pet", default_pet)
+            page = data.get("page", 0)
+            
+        if page == 5:
+            page = 4
+
+        return page, data.get("pet", default_pet)
     except:
         return 0, default_pet
     
@@ -190,6 +203,15 @@ while running:
     if pygame.time.get_ticks() % 3000 < 20:
         save_progress(current_page, pet)
 
+    if pet["hunger"] < 30:
+        current_face = sad_face
+    elif pet["energy"] < 30:
+        current_face = sleepy_face
+    elif pet["happiness"] > 80:
+        current_face = happy_face
+    else:
+        current_face = idle_face
+
     for event in events:
         if event.type == pygame.QUIT:
             running = False
@@ -243,7 +265,7 @@ while running:
 
         pygame.draw.rect(screen, color3, (box_x, box_y, box_width, box_height), 4, border_radius = 2)
 
-        screen.blit(idle_face, (WIDTH/2 - 98, HEIGHT/4))
+        screen.blit(current_face, (WIDTH/2 - 98, HEIGHT/4))
         button(feed_button_x, feed_button_y, button_width, button_height, feed_text)
         button(sleep_button_x, sleep_button_y, button_width, button_height, sleep_text)
         button(pet_button_x, pet_button_y, button_width, button_height, pet_text)
@@ -261,6 +283,15 @@ while running:
             y += 30
 
         button(back_button_x, back_button_y, back_button_width, back_button_height, back_text)
+
+    if pygame.time.get_ticks() % 2000 < 20:
+        if pet["hunger"] > 0:
+            pet["hunger"] -= 1
+        if pet["energy"] > 0:
+            pet["energy"] -= 1
+        if pet["cleanliness"] > 0:
+            pet["cleanliness"] -= 1
+            
 
     pygame.display.update()
     clock.tick(60)
