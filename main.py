@@ -30,6 +30,7 @@ page2 = "Can you guess who it is?"
 page3 = "It is your dog! Lessy!"
 page4 = ""
 page5 = ""
+page6 = ""
 
 pages_text = [
     page0,
@@ -202,10 +203,8 @@ while running:
                         last_update = 0
 
                         save_progress(current_page, pet)
-
-        if event.type == pygame.MOUSEBUTTONDOWN:
             if back_button_x <= mouse[0] <= back_button_x+80 and back_button_y <= mouse[1] <= back_button_y+30:
-                if current_page < len(pages_text) - 1:
+                if current_page > 0:
                     current_page -= 1
                     visible_length = 0
                     last_update = 0
@@ -253,11 +252,15 @@ while running:
 
     elif current_page == 5:
         screen.fill(BACKGROUND)
-        y = 90
+
+        pygame.draw.rect(screen, color3, (box_x, box_y, box_width, box_height), 4, border_radius = 2)
+        y = 170
         for key, value in pet.items():
-            text = button_font.render(f"{key}: {value}", True, color5)
-            screen.blit(text, (200, y))
-            y += 20
+            text = text_font.render(f"{key}: {value}", True, color5)
+            screen.blit(text, (140, y))
+            y += 30
+
+        button(back_button_x, back_button_y, back_button_width, back_button_height, back_text)
 
     pygame.display.update()
     clock.tick(60)
