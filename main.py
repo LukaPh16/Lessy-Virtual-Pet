@@ -106,6 +106,14 @@ image_folder = "assets/faces"
 idle_png = "idle.png"
 full_path_idle = os.path.join(image_folder, idle_png)
 
+add = 10
+
+feed_click_time = 0
+sleep_click_time = 0
+pet_click_time = 0
+clean_click_time = 0
+stats_click_time = 0
+
 running = True
 
 try:
@@ -135,7 +143,7 @@ def load_progress():
         with open("assets/memory.json", "r") as f:
             data = json.load(f)
             page = data.get("page", 0)
-            
+
         if page == 5:
             page = 4
 
@@ -173,6 +181,10 @@ def button(x, y, width, height, text_surface):
     pygame.draw.rect(screen, color, [x, y, width, height], border_radius = 2)
     screen.blit(text_surface, (x+10, y+8))
 
+def click_button(x, y, width, height, click_time):
+    if pygame.time.get_ticks() - click_time < 200:
+            pygame.draw.rect(screen, white, (x, y, width, height), 4, border_radius = 2)    
+
 def initial_pages(page_text):
     global current_page, visible_length, typing_speed, last_update
     current_time = pygame.time.get_ticks() / 1000
@@ -203,10 +215,12 @@ while running:
     if pygame.time.get_ticks() % 3000 < 20:
         save_progress(current_page, pet)
 
-    if pet["hunger"] < 30:
-        current_face = sad_face
-    elif pet["energy"] < 30:
+    if pet["energy"] < 30:
         current_face = sleepy_face
+    elif pet["hunger"] < 30:
+        current_face = sad_face
+    elif pet["cleanliness"] < 30:
+        current_face = sad_face
     elif pet["happiness"] > 80:
         current_face = happy_face
     else:
@@ -237,19 +251,24 @@ while running:
             if event.type == pygame.MOUSEBUTTONDOWN:
 
                 if feed_button_x <= mouse[0] <= feed_button_x+button_width and feed_button_y <= mouse[1] <= feed_button_y+button_height:
-                    pet["hunger"] += 10
+                    pet["hunger"] += add
+                    feed_click_time = pygame.time.get_ticks()
 
                 if sleep_button_x <= mouse[0] <= sleep_button_x+button_width and sleep_button_y <= mouse[1] <= sleep_button_y+button_height:
-                    pet["energy"] += 10
+                    pet["energy"] += add
+                    sleep_click_time = pygame.time.get_ticks()
 
                 if pet_button_x <= mouse[0] <= pet_button_x+button_width and pet_button_y <= mouse[1] <= pet_button_y+button_height:
-                    pet["happiness"] += 10
+                    pet["happiness"] += add
+                    pet_click_time = pygame.time.get_ticks()
 
                 if clean_button_x <= mouse[0] <= clean_button_x+button_width and clean_button_y <= mouse[1] <= clean_button_y+button_height:
-                    pet["cleanliness"] += 10
+                    pet["cleanliness"] += add
+                    clean_click_time = pygame.time.get_ticks()
 
                 if stats_button_x <= mouse[0] <= stats_button_x+button_width and stats_button_y <= mouse[1] <= stats_button_y+button_height:
                     current_page = 5
+                    stats_click_time = pygame.time.get_ticks()
 
             for key in pet:
                 pet[key] = max(0, min(100, pet[key]))
@@ -267,10 +286,15 @@ while running:
 
         screen.blit(current_face, (WIDTH/2 - 98, HEIGHT/4))
         button(feed_button_x, feed_button_y, button_width, button_height, feed_text)
+        click_button(feed_button_x, feed_button_y, button_width, button_height, feed_click_time)
         button(sleep_button_x, sleep_button_y, button_width, button_height, sleep_text)
+        click_button(sleep_button_x, sleep_button_y, button_width, button_height, sleep_click_time)
         button(pet_button_x, pet_button_y, button_width, button_height, pet_text)
+        click_button(pet_button_x, pet_button_y, button_width, button_height, pet_click_time)
         button(clean_button_x, clean_button_y, button_width, button_height, clean_text)
+        click_button(clean_button_x, clean_button_y, button_width, button_height, clean_click_time)
         button(stats_button_x, stats_button_y, button_width, button_height, stats_text)
+        click_button(stats_button_x, stats_button_y, button_width, button_height, stats_click_time)
 
     elif current_page == 5:
         screen.fill(BACKGROUND)
@@ -289,6 +313,8 @@ while running:
             pet["hunger"] -= 1
         if pet["energy"] > 0:
             pet["energy"] -= 1
+        if pet["happiness"] > 0:
+            pet["happiness"] -= 1
         if pet["cleanliness"] > 0:
             pet["cleanliness"] -= 1
             

@@ -1,9 +1,9 @@
 {
     "page": 4,
     "pet": {
-        "hunger": 77,
-        "energy": 77,
-        "happiness": 100,
-        "cleanliness": 77
+        "hunger": 55,
+        "energy": 70,
+        "happiness": 89,
+        "cleanliness": 35
     }
 }
