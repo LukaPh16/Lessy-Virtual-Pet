@@ -38,7 +38,6 @@ page2 = "Can you guess who it is?"
 page3 = "It is your dog! Lessy!"
 page4 = ""
 page5 = ""
-page6 = ""
 
 pages_text = [
     page0,
@@ -106,13 +105,15 @@ image_folder = "assets/faces"
 idle_png = "idle.png"
 full_path_idle = os.path.join(image_folder, idle_png)
 
-add = 10
+add = 15
 
 feed_click_time = 0
 sleep_click_time = 0
 pet_click_time = 0
 clean_click_time = 0
 stats_click_time = 0
+
+status_text = ""
 
 running = True
 
@@ -183,7 +184,7 @@ def button(x, y, width, height, text_surface):
 
 def click_button(x, y, width, height, click_time):
     if pygame.time.get_ticks() - click_time < 200:
-            pygame.draw.rect(screen, white, (x, y, width, height), 4, border_radius = 2)    
+            pygame.draw.rect(screen, color5, (x, y, width, height), 3, border_radius = 2)    
 
 def initial_pages(page_text):
     global current_page, visible_length, typing_speed, last_update
@@ -217,14 +218,19 @@ while running:
 
     if pet["energy"] < 30:
         current_face = sleepy_face
+        status_text = "I am sleepy..."
     elif pet["hunger"] < 30:
         current_face = sad_face
+        status_text = "I am hungry..."
     elif pet["cleanliness"] < 30:
         current_face = sad_face
+        status_text = "I am dirty..."
     elif pet["happiness"] > 80:
         current_face = happy_face
+        status_text = "I am happy!"
     else:
         current_face = idle_face
+        status_text = ""
 
     for event in events:
         if event.type == pygame.QUIT:
@@ -239,11 +245,12 @@ while running:
                         last_update = 0
 
                         save_progress(current_page, pet)
-            if back_button_x <= mouse[0] <= back_button_x+80 and back_button_y <= mouse[1] <= back_button_y+30:
-                if current_page > 0:
-                    current_page -= 1
-                    visible_length = 0
-                    last_update = 0
+            if current_page != 4:
+                if back_button_x <= mouse[0] <= back_button_x+80 and back_button_y <= mouse[1] <= back_button_y+30:
+                    if current_page > 0:
+                        current_page -= 1
+                        visible_length = 0
+                        last_update = 0
 
                 save_progress(current_page, pet)
 
@@ -272,6 +279,7 @@ while running:
 
             for key in pet:
                 pet[key] = max(0, min(100, pet[key]))
+            
                     
 
     if 0 <= current_page <= 3:
@@ -282,24 +290,32 @@ while running:
     elif current_page == 4:
         screen.fill(BACKGROUND)
 
-        pygame.draw.rect(screen, color3, (box_x, box_y, box_width, box_height), 4, border_radius = 2)
+        pygame.draw.rect(screen, color5, (box_x, box_y, box_width, box_height), 4, border_radius = 2)
 
         screen.blit(current_face, (WIDTH/2 - 98, HEIGHT/4))
         button(feed_button_x, feed_button_y, button_width, button_height, feed_text)
         click_button(feed_button_x, feed_button_y, button_width, button_height, feed_click_time)
+        
         button(sleep_button_x, sleep_button_y, button_width, button_height, sleep_text)
         click_button(sleep_button_x, sleep_button_y, button_width, button_height, sleep_click_time)
+
         button(pet_button_x, pet_button_y, button_width, button_height, pet_text)
         click_button(pet_button_x, pet_button_y, button_width, button_height, pet_click_time)
+
         button(clean_button_x, clean_button_y, button_width, button_height, clean_text)
         click_button(clean_button_x, clean_button_y, button_width, button_height, clean_click_time)
+
         button(stats_button_x, stats_button_y, button_width, button_height, stats_text)
         click_button(stats_button_x, stats_button_y, button_width, button_height, stats_click_time)
+
+        if status_text:
+            status = text_font.render(status_text, True, color5)
+            screen.blit(status, (165, 340))
 
     elif current_page == 5:
         screen.fill(BACKGROUND)
 
-        pygame.draw.rect(screen, color3, (box_x, box_y, box_width, box_height), 4, border_radius = 2)
+        pygame.draw.rect(screen, color5, (box_x, box_y, box_width, box_height), 4, border_radius = 2)
         y = 170
         for key, value in pet.items():
             text = text_font.render(f"{key}: {value}", True, color5)
