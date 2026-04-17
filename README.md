@@ -50,21 +50,22 @@ python main.py
 
 ## Project Structure
 
-project:
+project
+
 main.py
-    assets:
-        faces:
+
+assets
+
+    faces
         idle.png
         happy.png
         sad.png
         sleepy.png
 
-        font:
-            pixel.ttf
+    font
+        pixel.ttf
 
-        memory.json
-
----
+    memory.json
 
 ## Save System
 
