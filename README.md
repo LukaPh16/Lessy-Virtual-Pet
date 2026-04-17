@@ -51,19 +51,18 @@ python main.py
 ## Project Structure
 
 project/
-│
-├── main.py
-├── assets/
-│   ├── faces/
-│   │   ├── idle.png
-│   │   ├── happy.png
-│   │   ├── sad.png
-│   │   ├── sleepy.png
-│   │
-│   ├── font/
-│   │   └── pixel.ttf
-│   │
-│   └── memory.json
+main.py
+    assets/
+        faces/
+        idle.png
+        happy.png
+        sad.png
+        sleepy.png
+
+        font/
+            pixel.ttf
+
+        memory.json
 
 ---
 
