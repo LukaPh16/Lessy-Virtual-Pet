@@ -50,16 +50,16 @@ python main.py
 
 ## Project Structure
 
-project/
+project:
 main.py
-    assets/
-        faces/
+    assets:
+        faces:
         idle.png
         happy.png
         sad.png
         sleepy.png
 
-        font/
+        font:
             pixel.ttf
 
         memory.json
